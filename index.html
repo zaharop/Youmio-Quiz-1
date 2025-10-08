@@ -381,70 +381,87 @@
         // Quiz data
         const quizData = [
             {
-                question: "According to Youmio’s tweet, approximately how many wearable SBTs have been minted and mentioned as listed on OpenSea?",
-                options: ["~6,500", "~65,000", "~650,000", "~65"],
-                correct: 1
-            },
-            {
-                question: "In the Youmio announcement, the project said its ecosystem will be ‘living on its own L1’ in partnership with which network?",
-                options: ["Ethereum", "Solana", "Avalanche (AVAX)", "Polygon"],
-                correct: 2
-            },
-            {
-                question: "What does ‘L1’ most commonly refer to in blockchain terminology (as used in the Youmio announcement)?",
-                options: ["A second-layer scaling solution",
-                          "A Layer-1 blockchain (base/mainchain)",
-                          "A token standards committee",
-                          "A decentralized exchange (DEX)"],
-                correct: 1
-            },
-            {
-                question: "What is OpenSea in the context of Youmio’s tweet about wearable SBTs?",
-                options: [ "A hardware wallet brand",
+      question: "According to Youmio’s tweet, approximately how many wearable SBTs have been minted and mentioned as listed on OpenSea?",
+      options: ["~6,500", "~65,000", "~650,000", "~65"],
+      correct: 1,
+    },
+    {
+      question: "In the Youmio announcement, the project said its ecosystem will be ‘living on its own L1’ in partnership with which network?",
+      options: ["Ethereum", "Solana", "Avalanche (AVAX)", "Polygon"],
+      correct: 2,
+    },
+    {
+      question: "What does ‘L1’ most commonly refer to in blockchain terminology (as used in the Youmio announcement)?",
+      options: [
+        "A second-layer scaling solution",
+        "A Layer-1 blockchain (base/mainchain)",
+        "A token standards committee",
+        "A decentralized exchange (DEX)",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What is OpenSea in the context of Youmio’s tweet about wearable SBTs?",
+      options: [
+        "A hardware wallet brand",
         "An NFT marketplace where digital assets like wearables can be listed and viewed",
         "A Layer-1 blockchain",
-        "A decentralized identity protocol"],
-                correct: 1
-            },
-            {
-                question: "Youmio mentioned a ‘Mint to Chain’ style utility in their posts. Which of the following best describes ‘mint-to-chain’?",
-                options: [
+        "A decentralized identity protocol",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Youmio mentioned a ‘Mint to Chain’ style utility in their posts. Which of the following best describes ‘mint-to-chain’?",
+      options: [
         "Sending NFTs from one chain to another automatically",
         "Minting an asset (NFT/SBT) directly on a blockchain so the token exists on-chain immediately",
         "A swap between tokens across DEXs",
         "Off-chain storage of metadata only",
       ],
-                correct: 1
-            },
-            {
-                question: "Which Youmio milestone was explicitly mentioned in their posts as a measure of early network activity?",
-                options: ["10,000 wallets created",
+      correct: 1,
+    },
+    {
+      question: "Which Youmio milestone was explicitly mentioned in their posts as a measure of early network activity?",
+      options: [
+        "10,000 wallets created",
         "Closed Testnet crossed 500k transactions",
         "1 million active users",
         "Mainnet launch on Ethereum",
-                         ],
-                correct: 1
-            },
-            {
-                question: "What kind of reward mechanic did Youmio reference as part of their L1 ecosystem (useful for community/utility)?",
-                options: ["Proof-of-Work mining rewards",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What kind of reward mechanic did Youmio reference as part of their L1 ecosystem (useful for community/utility)?",
+      options: [
+        "Proof-of-Work mining rewards",
         "‘Affinity’ rewards mechanics tied to utility and 3D assets",
         "Only simple airdrops with no utility",
         "Yield farming for stablecoins",
-                         ],
-                correct: 1
-            },
-            {
-                question: "If a user wants to view Youmio’s wearable SBT listings as referenced in the tweet, what’s the most direct place to check?",
-                options: ["A centralized exchange order book",
-                         "The OpenSea marketplace listing for the project",
-                         "An email newsletter archive",
-                         "A private Discord DM only",
-                 ],
-                correct: 1
-            },
-            {
-                question: "Which claim below best matches Youmio’s public positioning from the analysed tweets?",
+      ],
+      correct: 1,
+    },
+    {
+      question: "If a user wants to view Youmio’s wearable SBT listings as referenced in the tweet, what’s the most direct place to check?",
+      options: [
+        "A centralized exchange order book",
+        "The OpenSea marketplace listing for the project",
+        "An email newsletter archive",
+        "A private Discord DM only",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Why would a project choose to run its own L1 (as Youmio announced) instead of staying entirely on another chain? (Best single answer)",
+      options: [
+        "To avoid needing any validators or nodes",
+        "To have custom consensus, lower fees, and tighter control over protocol features and economics",
+        "To become fully centralized under one company",
+        "To eliminate the need for wallets",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Which claim below best matches Youmio’s public positioning from the analysed tweets?",
       options: [
         "Youmio is primarily a hardware wallet company.",
         "Youmio is building an on-chain AI/3D agent ecosystem with NFTs/SBT utilities, launching L1 infrastructure (partnering with AVAX) and achieving testnet growth.",
@@ -452,12 +469,7 @@
         "Youmio is shutting down operations.",
       ],
       correct: 1,
-            },
-            {
-                question: "How many continents are there?",
-                options: ["5", "6", "7", "8"],
-                correct: 2
-            }
+    },
         ];
 
         let currentQuestion = 0;
