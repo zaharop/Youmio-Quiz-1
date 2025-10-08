@@ -1,0 +1,448 @@
+import React, { useEffect, useRef, useState } from "react";
+
+export default function QuizMaster() {
+  const initialQuestions = [
+    {
+      question: "According to Youmio’s tweet, approximately how many wearable SBTs have been minted and mentioned as listed on OpenSea?",
+      options: ["~6,500", "~65,000", "~650,000", "65"],
+      correct: 1,
+    },
+    {
+      question: "In the Youmio announcement, the project said its ecosystem will be ‘living on its own L1’ in partnership with which network?",
+      options: ["Ethereum", "Solana", "Avalanche (AVAX)", "Polygon"],
+      correct: 2,
+    },
+    {
+      question: "What does ‘L1’ most commonly refer to in blockchain terminology (as used in the Youmio announcement)?",
+      options: [
+        "A second-layer scaling solution",
+        "A Layer-1 blockchain (base/mainchain)",
+        "A token standards committee",
+        "A decentralized exchange (DEX)",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What is OpenSea in the context of Youmio’s tweet about wearable SBTs?",
+      options: [
+        "A hardware wallet brand",
+        "An NFT marketplace where digital assets like wearables can be listed and viewed",
+        "A Layer-1 blockchain",
+        "A decentralized identity protocol",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Youmio mentioned a ‘Mint to Chain’ style utility in their posts. Which of the following best describes ‘mint-to-chain’?",
+      options: [
+        "Sending NFTs from one chain to another automatically",
+        "Minting an asset (NFT/SBT) directly on a blockchain so the token exists on-chain immediately",
+        "A swap between tokens across DEXs",
+        "Off-chain storage of metadata only",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Which Youmio milestone was explicitly mentioned in their posts as a measure of early network activity?",
+      options: [
+        "10,000 wallets created",
+        "Closed Testnet crossed 500k transactions",
+        "1 million active users",
+        "Mainnet launch on Ethereum",
+      ],
+      correct: 1,
+    },
+    {
+      question: "What kind of reward mechanic did Youmio reference as part of their L1 ecosystem (useful for community/utility)?",
+      options: [
+        "Proof-of-Work mining rewards",
+        "‘Affinity’ rewards mechanics tied to utility and 3D assets",
+        "Only simple airdrops with no utility",
+        "Yield farming for stablecoins",
+      ],
+      correct: 1,
+    },
+    {
+      question: "If a user wants to view Youmio’s wearable SBT listings as referenced in the tweet, what’s the most direct place to check?",
+      options: [
+        "A centralized exchange order book",
+        "The OpenSea marketplace listing for the project",
+        "An email newsletter archive",
+        "A private Discord DM only",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Why would a project choose to run its own L1 (as Youmio announced) instead of staying entirely on another chain? (Best single answer)",
+      options: [
+        "To avoid needing any validators or nodes",
+        "To have custom consensus, lower fees, and tighter control over protocol features and economics",
+        "To become fully centralized under one company",
+        "To eliminate the need for wallets",
+      ],
+      correct: 1,
+    },
+    {
+      question: "Which claim below best matches Youmio’s public positioning from the analysed tweets?",
+      options: [
+        "Youmio is primarily a hardware wallet company.",
+        "Youmio is building an on-chain AI/3D agent ecosystem with NFTs/SBT utilities, launching L1 infrastructure (partnering with AVAX) and achieving testnet growth.",
+        "Youmio is only a social media marketing agency.",
+        "Youmio is shutting down operations.",
+      ],
+      correct: 1,
+    },
+  ];
+
+  function shuffleArray(a) {
+    const arr = a.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function shuffleQuestionsWithOptions(source) {
+    const questionsCopy = source.map((q) => {
+      const opts = q.options.map((o, idx) => ({ text: o, originalIndex: idx }));
+      const shuffledOpts = shuffleArray(opts);
+      const newCorrect = shuffledOpts.findIndex((o) => o.originalIndex === q.correct);
+      return { question: q.question, options: shuffledOpts.map((o) => o.text), correct: newCorrect };
+    });
+    return shuffleArray(questionsCopy);
+  }
+
+  const svgContainerRef = useRef(null);
+  const screenRef = useRef(null);
+
+  const [questions, setQuestions] = useState(() => shuffleQuestionsWithOptions(initialQuestions));
+  const [phase, setPhase] = useState("start");
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState({ text: "", type: "" });
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [minted, setMinted] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("quiz_leaderboard");
+      if (raw) setLeaderboard(JSON.parse(raw));
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadSvgAndStart() {
+      try {
+        const res = await fetch('/interactive_dragon.svg');
+        if (!res.ok) return;
+        const text = await res.text();
+        if (!mounted) return;
+        if (svgContainerRef.current) svgContainerRef.current.innerHTML = text;
+        const svgRoot = svgContainerRef.current.querySelector('svg');
+        const screen = svgContainerRef.current.querySelector('#screen');
+        screenRef.current = screen;
+        if (!svgRoot || !screen) return;
+        const xmlns = 'http://www.w3.org/2000/svg';
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        const pointer = { x: width / 2, y: height / 2 };
+        const N = 40;
+        const elems = [];
+        for (let i = 0; i < N; i++) elems[i] = { use: null, x: width / 2, y: 0 };
+        const prepend = (useId, i) => {
+          const elem = document.createElementNS(xmlns, 'use');
+          elems[i].use = elem;
+          elem.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${useId}`);
+          screen.prepend(elem);
+        };
+        for (let i = 1; i < N; i++) {
+          if (i === 1) prepend('Cabeza', i);
+          else if (i === 8 || i === 14) prepend('Aletas', i);
+          else prepend('Espina', i);
+        }
+        let frm = Math.random();
+        let rad = 0;
+        const radm = Math.min(pointer.x, pointer.y) - 20;
+        function resize() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize, false);
+        window.addEventListener('pointermove', (e) => {
+          pointer.x = e.clientX;
+          pointer.y = e.clientY;
+          rad = 0;
+        });
+        function run() {
+          if (!mounted) return;
+          requestAnimationFrame(run);
+          const e0 = elems[0];
+          const ax = (Math.cos(3 * frm) * rad * width) / height;
+          const ay = (Math.sin(4 * frm) * rad * height) / width;
+          e0.x += (ax + pointer.x - e0.x) / 10;
+          e0.y += (ay + pointer.y - e0.y) / 10;
+          for (let i = 1; i < N; i++) {
+            const e = elems[i];
+            const ep = elems[i - 1];
+            const a = Math.atan2(e.y - ep.y, e.x - ep.x);
+            e.x += (ep.x - e.x + (Math.cos(a) * (100 - i)) / 5) / 4;
+            e.y += (ep.y - e.y + (Math.sin(a) * (100 - i)) / 5) / 4;
+            const s = (162 + 4 * (1 - i)) / 50;
+            const tx = (ep.x + e.x) / 2;
+            const ty = (ep.y + e.y) / 2;
+            const rot = (180 / Math.PI) * a;
+            if (e.use) e.use.setAttribute('transform', `translate(${tx},${ty}) rotate(${rot}) translate(0,0) scale(${s},${s})`);
+          }
+          if (rad < radm) rad++;
+          frm += 0.003;
+          if (rad > 60) {
+            pointer.x += (width / 2 - pointer.x) * 0.05;
+            pointer.y += (height / 2 - pointer.y) * 0.05;
+          }
+        }
+        run();
+      } catch (e) {
+      }
+    }
+    loadSvgAndStart();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  function startQuiz() {
+    setQuestions(shuffleQuestionsWithOptions(initialQuestions));
+    setPhase("quiz");
+    setCurrent(0);
+    setSelected(null);
+    setScore(0);
+    setFeedback({ text: "", type: "" });
+    setMinted(false);
+  }
+
+  function selectOption(index) {
+    if (selected !== null) return;
+    setSelected(index);
+    const q = questions[current];
+    if (index === q.correct) {
+      setScore((s) => s + 1);
+      setFeedback({ text: "🎉 Correct! Well done!", type: "correct" });
+    } else {
+      setFeedback({ text: `❌ Incorrect. The correct answer is: ${q.options[q.correct]}`, type: "incorrect" });
+    }
+  }
+
+  function nextQuestion() {
+    if (current + 1 >= questions.length) {
+      showResults();
+      return;
+    }
+    setCurrent((c) => c + 1);
+    setSelected(null);
+    setFeedback({ text: "", type: "" });
+  }
+
+  function showResults() {
+    setPhase("results");
+  }
+
+  function restartQuiz() {
+    setQuestions(shuffleQuestionsWithOptions(initialQuestions));
+    setPhase("start");
+    setCurrent(0);
+    setSelected(null);
+    setScore(0);
+    setFeedback({ text: "", type: "" });
+    setMinted(false);
+  }
+
+  function saveScore() {
+    if (phase !== "results") return;
+    const name = window.prompt("Enter your display name (optional):") || "Anonymous";
+    const entry = { name, score, total: questions.length, date: new Date().toISOString() };
+    try {
+      const raw = localStorage.getItem("quiz_leaderboard");
+      const list = raw ? JSON.parse(raw) : [];
+      list.unshift(entry);
+      const trimmed = list.slice(0, 50);
+      localStorage.setItem("quiz_leaderboard", JSON.stringify(trimmed));
+      setLeaderboard(trimmed);
+      window.alert("Saved to leaderboard");
+    } catch (e) {
+      window.alert("Could not save leaderboard locally");
+    }
+  }
+
+  function renderLeaderboardItems() {
+    if (!leaderboard || leaderboard.length === 0) return <div style={{ color: '#777', padding: 8 }}>No entries yet</div>;
+    return leaderboard.map((item, idx) => (
+      <div className="leaderboard-item" key={idx}>
+        <div>{idx + 1}. {escapeHtml(item.name)}</div>
+        <div>{item.score}/{item.total}</div>
+      </div>
+    ));
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (s) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
+    });
+  }
+
+  async function mintNFT() {
+    if (phase !== "results" || score < 7) {
+      window.alert('You must score 7 or more to mint.');
+      return;
+    }
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const address = accounts[0];
+        const chainIdHex = '0x10C56';
+        try {
+          await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: chainIdHex }] });
+        } catch (e) {}
+        try {
+          const raw = localStorage.getItem('quiz_mints');
+          const list = raw ? JSON.parse(raw) : [];
+          list.push({ address, score, date: new Date().toISOString() });
+          localStorage.setItem('quiz_mints', JSON.stringify(list));
+          setMinted(true);
+          window.alert('Mint simulated. In a real integration the wallet would send a transaction to the NFT contract.');
+        } catch (e) {
+          window.alert('Could not record mint locally');
+        }
+      } catch (e) {
+        window.alert('Wallet connection failed or was rejected. Mint canceled.');
+      }
+    } else {
+      try {
+        const raw = localStorage.getItem('quiz_mints');
+        const list = raw ? JSON.parse(raw) : [];
+        list.push({ address: 'local-demo', score, date: new Date().toISOString() });
+        localStorage.setItem('quiz_mints', JSON.stringify(list));
+        setMinted(true);
+        window.alert('No wallet detected. Mint simulated locally.');
+      } catch (e) {
+        window.alert('Could not simulate mint locally');
+      }
+    }
+  }
+
+  const percentage = Math.round((score / questions.length) * 100);
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: `linear-gradient(135deg, rgba(102,126,234,0.85), rgba(118,75,162,0.85))`, fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+      <div ref={svgContainerRef} style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 980, background: 'linear-gradient(135deg, rgba(255,255,255,0.94), rgba(250,250,255,0.9))', borderRadius: 24, padding: 40, boxShadow: '0 30px 60px rgba(2,6,23,0.28)', backdropFilter: 'blur(6px)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 30 }}>
+          <div style={{ background: 'linear-gradient(45deg,#ffd54f,#ff9800)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '2.5rem', fontWeight: 'bold', marginBottom: 10 }}>🧠 Youmio Quiz</div>
+          <div style={{ color: '#444', fontSize: '1.1rem' }}>Test Your Knowledge — NFT rewards for top scorers</div>
+        </div>
+
+        {phase === 'start' && (
+          <div style={{ textAlign: 'center' }}>
+            <h2 style={{ color: '#333', marginBottom: 20, fontSize: '1.8rem' }}>Welcome to Youmio Quiz!</h2>
+            <p style={{ color: '#666', marginBottom: 30, fontSize: '1.1rem', lineHeight: 1.6 }}>Test your knowledge with our interactive quiz. Score 7+ to unlock an NFT mint option.</p>
+            <div style={{ textAlign: 'center' }}>
+              <button onClick={startQuiz} style={{ padding: '15px 30px', borderRadius: 50, fontSize: '1.1rem', fontWeight: 'bold', color: '#fff', background: 'linear-gradient(45deg,#667eea,#764ba2)', border: 'none', cursor: 'pointer' }}>Start Quiz</button>
+            </div>
+          </div>
+        )}
+
+        {phase === 'quiz' && (
+          <div>
+            <div style={{ textAlign: 'center', marginBottom: 20, color: '#666', fontSize: '0.9rem' }}>
+              <span>{current + 1}</span> of <span>{questions.length}</span>
+            </div>
+
+            <div style={{ height: 6, background: 'rgba(255,255,255,0.6)', borderRadius: 3, marginBottom: 30, overflow: 'hidden', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)' }}>
+              <div style={{ height: '100%', background: 'linear-gradient(45deg,#ffd54f,#ff9800)', width: `${(current / questions.length) * 100}%`, transition: 'width 0.3s ease' }} />
+            </div>
+
+            <div style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,245,250,0.92))', padding: 25, borderRadius: 15, marginBottom: 25, borderLeft: '6px solid #ffd54f' }}>
+              <h3 style={{ color: '#222', fontSize: '1.3rem', lineHeight: 1.5, marginBottom: 20 }}>{questions[current].question}</h3>
+              <div style={{ display: 'grid', gap: 12 }}>
+                {questions[current].options.map((opt, i) => {
+                  const isCorrect = selected !== null && i === questions[current].correct;
+                  const isIncorrect = selected !== null && i === selected && selected !== questions[current].correct;
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => selectOption(i)}
+                      style={{ background: 'white', border: isCorrect ? '2px solid #4CAF50' : isIncorrect ? '2px solid #f44336' : '2px solid rgba(0,0,0,0.06)', borderRadius: 12, padding: 15, cursor: selected === null ? 'pointer' : 'default', pointerEvents: selected === null ? 'auto' : 'none', boxShadow: '0 6px 20px rgba(11,12,30,0.04)' }}
+                    >
+                      <div style={{ fontWeight: 600 }}>{String.fromCharCode(65 + i)}. {opt}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {feedback.text && (
+              <div style={{ margin: '20px 0', padding: 15, borderRadius: 10, textAlign: 'center', fontWeight: 'bold', display: 'block', background: feedback.type === 'correct' ? 'rgba(76,175,80,0.08)' : 'rgba(244,67,54,0.08)', color: feedback.type === 'correct' ? '#2e7d32' : '#c62828', border: `1px solid ${feedback.type === 'correct' ? '#66bb6a' : '#ef5350'}` }}>{feedback.text}</div>
+            )}
+
+            <div style={{ textAlign: 'center', marginTop: 30 }}>
+              <button onClick={() => { setPhase('start'); }} style={{ marginRight: 10, padding: '10px 20px', borderRadius: 50, background: '#eee', color: '#333', border: 'none' }}>Pause</button>
+              <button onClick={nextQuestion} style={{ padding: '10px 20px', borderRadius: 50, background: 'linear-gradient(45deg,#667eea,#764ba2)', color: '#fff', border: 'none' }} disabled={selected === null}>Next Question</button>
+            </div>
+          </div>
+        )}
+
+        {phase === 'results' && (
+          <div style={{ textAlign: 'center' }}>
+            <h2 style={{ marginBottom: 10 }}>Quiz Complete!</h2>
+            <div style={{ width: 200, height: 200, borderRadius: '50%', margin: '30px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', fontSize: '2rem', fontWeight: 'bold', color: 'white', boxShadow: '0 12px 40px rgba(0,0,0,0.15)' }}>
+              <div id="score-percentage">{percentage}%</div>
+              <div style={{ fontSize: '0.8rem', marginTop: 5 }}>Score</div>
+            </div>
+
+            <div style={{ color: '#333', fontSize: '1.3rem', margin: '20px 0' }}>{percentage >= 80 ? "🏆 Excellent! You're a quiz master!" : percentage >= 60 ? '👏 Good job! You did well!' : percentage >= 40 ? '👍 Not bad! Keep practicing!' : "💪 Don't give up! Try again!"}</div>
+
+            <div style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,255,0.96))', borderRadius: 15, padding: 25, margin: '20px 0', boxShadow: '0 8px 30px rgba(11,12,30,0.04)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0', fontSize: '1.1rem' }}>
+                <span>Correct Answers:</span>
+                <strong id="correct-count">{score}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0', fontSize: '1.1rem' }}>
+                <span>Incorrect Answers:</span>
+                <strong id="incorrect-count">{questions.length - score}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0', fontSize: '1.1rem' }}>
+                <span>Total Questions:</span>
+                <strong id="total-count">{questions.length}</strong>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button onClick={restartQuiz} style={{ padding: '10px 20px', borderRadius: 50, background: 'linear-gradient(45deg,#667eea,#764ba2)', color: '#fff', border: 'none' }}>Take Quiz Again</button>
+              <button onClick={saveScore} style={{ padding: '10px 20px', borderRadius: 50, background: '#2ecc71', color: '#fff', border: 'none' }}>Save to Leaderboard</button>
+            </div>
+
+            {score >= 7 && !minted && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: '0.9rem', color: '#555', marginTop: 10 }}>You scored 7 or more — you're eligible to mint an NFT reward.</div>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 10 }}>
+                  <button onClick={mintNFT} style={{ padding: '10px 20px', borderRadius: 50, background: 'linear-gradient(45deg,#FFD54F,#FF9800)', color: '#000', border: 'none' }}>Mint NFT</button>
+                </div>
+              </div>
+            )}
+
+            {minted && (
+              <div style={{ textAlign: 'center', marginTop: 12, padding: 12, borderRadius: 12, background: '#fff3cd', color: '#856404' }}>Congratulations — your NFT mint was simulated and marked as minted in this demo.</div>
+            )}
+
+            <div style={{ background: '#fff', borderRadius: 12, padding: 12, maxHeight: 200, overflow: 'auto', border: '1px solid #e6e6e6', marginTop: 12 }}>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>Leaderboard</div>
+              <div>{renderLeaderboardItems()}</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
