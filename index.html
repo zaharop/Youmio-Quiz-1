@@ -1,309 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>QuizMaster - Test Your Knowledge</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            min-height: 100vh; display:flex; align-items:center; justify-content:center; padding:20px;
         }
-
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 800px;
-            padding: 40px;
-            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            border-radius:20px; box-shadow:0 20px 40px rgba(0,0,0,0.1);
+            width:100%; max-width:900px; padding:30px; transition:all 0.3s ease;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        .quiz-section {
-            display: none;
-        }
-
-        .quiz-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .question-counter {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            margin-bottom: 30px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .question {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border-left: 5px solid #667eea;
-        }
-
-        .question h3 {
-            color: #333;
-            font-size: 1.3rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .options {
-            display: grid;
-            gap: 12px;
-        }
-
-        .option {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .option:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .option.selected {
-            border-color: #667eea;
-            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-        }
-
-        .option.correct {
-            border-color: #4CAF50;
-            background: linear-gradient(45deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.2));
-            animation: correctPulse 0.6s ease;
-        }
-
-        .option.incorrect {
-            border-color: #f44336;
-            background: linear-gradient(45deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.2));
-            animation: incorrectShake 0.6s ease;
-        }
-
-        @keyframes correctPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        @keyframes incorrectShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .feedback {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            display: none;
-        }
-
-        .feedback.correct {
-            background: rgba(76, 175, 80, 0.1);
-            color: #4CAF50;
-            border: 2px solid #4CAF50;
-        }
-
-        .feedback.incorrect {
-            background: rgba(244, 67, 54, 0.1);
-            color: #f44336;
-            border: 2px solid #f44336;
-        }
-
-        .buttons {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .start-screen {
-            text-align: center;
-        }
-
-        .start-screen h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-
-        .start-screen p {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .results-screen {
-            text-align: center;
-        }
-
-        .score-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            margin: 30px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .score-circle.excellent {
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
-        }
-
-        .score-circle.good {
-            background: linear-gradient(45deg, #FF9800, #FFC107);
-        }
-
-        .score-circle.average {
-            background: linear-gradient(45deg, #2196F3, #03A9F4);
-        }
-
-        .score-circle.poor {
-            background: linear-gradient(45deg, #f44336, #FF5722);
-        }
-
-        .score-text {
-            font-size: 0.8rem;
-            margin-top: 5px;
-        }
-
-        .results-message {
-            color: #333;
-            font-size: 1.3rem;
-            margin: 20px 0;
-        }
-
-        .results-breakdown {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-
-        .breakdown-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            font-size: 1.1rem;
-        }
-
-        .breakdown-item strong {
-            color: #333;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .logo {
-                font-size: 2rem;
-            }
-            
-            .option {
-                padding: 12px 15px;
-            }
-            
-            .score-circle {
-                width: 150px;
-                height: 150px;
-                font-size: 1.5rem;
-            }
-        }
+        .header { text-align:center; margin-bottom:20px; }
+        .logo { background:linear-gradient(45deg,#667eea,#764ba2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:2rem; font-weight:700; margin-bottom:6px; }
+        .subtitle { color:#666; font-size:0.95rem; }
+        .quiz-section { display:none; }
+        .quiz-section.active { display:block; animation:fadeIn .4s ease-in; }
+        @keyframes fadeIn { from {opacity:0; transform:translateY(12px)} to {opacity:1; transform:translateY(0)} }
+        .question { background:#f8f9fa; padding:20px; border-radius:12px; margin-bottom:18px; border-left:5px solid #667eea; }
+        .options { display:grid; gap:10px; }
+        .option { background:white; border:2px solid #e0e0e0; border-radius:10px; padding:12px 16px; cursor:pointer; transition:all .2s; }
+        .option:hover { transform:translateY(-2px); border-color:#667eea; }
+        .option.correct { border-color:#4CAF50; background:rgba(76,175,80,0.06); }
+        .option.incorrect { border-color:#f44336; background:rgba(244,67,54,0.06); }
+        .buttons { text-align:center; margin-top:18px; }
+        .btn { background:linear-gradient(45deg,#667eea,#764ba2); color:#fff; border:none; padding:10px 18px; border-radius:40px; cursor:pointer; font-weight:700; }
+        .btn.secondary { background:#eee; color:#333; }
+        .leaderboard { background:#fff; border-radius:10px; padding:10px; border:1px solid #eee; max-height:220px; overflow:auto; margin-top:12px; }
+        .leaderboard-item { display:flex; justify-content:space-between; padding:8px 6px; border-bottom:1px solid #fafafa; font-size:0.95rem; }
+        .note { font-size:0.9rem; color:#555; margin-top:8px; }
+        .progress-bar { height:8px; background:#e9e9e9; border-radius:999px; overflow:hidden; margin-bottom:14px; }
+        .progress-fill { height:100%; background:linear-gradient(45deg,#667eea,#764ba2); width:0%; transition:width .25s ease; }
+        .results-breakdown { background:#f8f9fa; border-radius:12px; padding:14px; margin-top:12px; }
+        @media (max-width:600px){ .container{padding:18px} .logo{font-size:1.6rem} }
     </style>
 </head>
 <body>
@@ -314,73 +48,74 @@
         </div>
 
         <!-- Start Screen -->
-        <div id="start-screen" class="quiz-section active start-screen">
-            <h2>Welcome to QuizMaster!</h2>
-            <p>Test your knowledge with our interactive quiz. You'll get immediate feedback on each question and see your final score at the end.</p>
-            <div class="buttons">
+        <div id="start-screen" class="quiz-section active">
+            <h2 style="text-align:center; color:#222; margin-bottom:8px">Welcome to QuizMaster!</h2>
+            <p style="text-align:center; color:#555; margin-bottom:16px">Score 7+ to unlock an NFT mint option. Questions shuffle on each play.</p>
+            <div style="text-align:center;">
                 <button class="btn" onclick="startQuiz()">Start Quiz</button>
+            </div>
+
+            <div style="margin-top:18px;">
+                <h3 style="margin-bottom:8px">Leaderboard</h3>
+                <div id="leaderboard-start" class="leaderboard"></div>
             </div>
         </div>
 
         <!-- Quiz Screen -->
         <div id="quiz-screen" class="quiz-section">
-            <div class="question-counter">
-                <span id="current-question">1</span> of <span id="total-questions">10</span>
-            </div>
-            
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div class="question-counter"><strong><span id="current-question">1</span></strong> / <span id="total-questions">10</span></div>
+                <div style="width:60%;"><div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div></div>
             </div>
 
             <div class="question">
                 <h3 id="question-text"></h3>
-                <div class="options" id="options-container">
-                </div>
+                <div class="options" id="options-container"></div>
             </div>
 
-            <div class="feedback" id="feedback"></div>
+            <div id="feedback" class="note" style="display:none"></div>
 
             <div class="buttons">
+                <button class="btn secondary" id="pause-btn" onclick="pauseQuiz()">Pause</button>
                 <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
             </div>
         </div>
 
         <!-- Results Screen -->
-        <div id="results-screen" class="quiz-section results-screen">
-            <h2>Quiz Complete!</h2>
-            
-            <div class="score-circle" id="score-circle">
-                <div id="score-percentage">0%</div>
-                <div class="score-text">Score</div>
-            </div>
+        <div id="results-screen" class="quiz-section">
+            <h2 style="text-align:center; color:#222">Quiz Complete!</h2>
 
-            <div class="results-message" id="results-message"></div>
-
-            <div class="results-breakdown">
-                <div class="breakdown-item">
-                    <span>Correct Answers:</span>
-                    <strong id="correct-count">0</strong>
-                </div>
-                <div class="breakdown-item">
-                    <span>Incorrect Answers:</span>
-                    <strong id="incorrect-count">0</strong>
-                </div>
-                <div class="breakdown-item">
-                    <span>Total Questions:</span>
-                    <strong id="total-count">0</strong>
+            <div style="display:flex;gap:14px;align-items:center;justify-content:center;margin-top:12px;">
+                <div style="width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-weight:700;background:linear-gradient(45deg,#4CAF50,#8BC34A);">
+                    <div id="score-percentage">0%</div>
+                    <div style="font-size:0.85rem;margin-top:6px;">Score</div>
                 </div>
             </div>
 
-            <div class="buttons">
+            <div id="results-message" style="text-align:center;margin-top:12px;color:#333;font-weight:600"></div>
+
+            <div class="results-breakdown" style="margin-top:12px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><div>Correct Answers:</div><div id="correct-count">0</div></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><div>Incorrect Answers:</div><div id="incorrect-count">0</div></div>
+                <div style="display:flex;justify-content:space-between;"><div>Total Questions:</div><div id="total-count">0</div></div>
+            </div>
+
+            <div style="text-align:center;margin-top:12px">
                 <button class="btn" onclick="restartQuiz()">Take Quiz Again</button>
+                <button class="btn" onclick="saveScore()" style="margin-left:8px">Save to Leaderboard</button>
+            </div>
+
+            <div style="margin-top:14px">
+                <h3 style="margin-bottom:8px">Leaderboard</h3>
+                <div id="leaderboard-results" class="leaderboard"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Quiz data
-        const quizData = [
-            {
+    // ---------- Data (unchanged questions & correct indices) ----------
+    const initialQuestions = [
+    {
       question: "According to Youmio’s tweet, approximately how many wearable SBTs have been minted and mentioned as listed on OpenSea?",
       options: ["~6,500", "~65,000", "~650,000", "~65"],
       correct: 1,
@@ -469,128 +204,240 @@
         "Youmio is shutting down operations.",
       ],
       correct: 1,
-    },
-        ];
+    }
+    ];
 
-        let currentQuestion = 0;
-        let score = 0;
-        let selectedOption = -1;
-        let quizCompleted = false;
+    // ---------- helpers ----------
+    function shuffleArray(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
 
-        function startQuiz() {
-            document.getElementById('start-screen').classList.remove('active');
-            document.getElementById('quiz-screen').classList.add('active');
-            document.getElementById('total-questions').textContent = quizData.length;
+    // Create a fresh quiz copy with options shuffled per-question and correct index remapped
+    function makeShuffledQuiz() {
+        // deep clone questions
+        const copy = initialQuestions.map(q => {
+            const opts = q.options.map((o, idx) => ({ text: o, idx }));
+            const shuffledOpts = shuffleArray(opts);
+            const newCorrect = shuffledOpts.findIndex(x => x.idx === q.correct);
+            return { question: q.question, options: shuffledOpts.map(x => x.text), correct: newCorrect };
+        });
+        return shuffleArray(copy);
+    }
+
+    // leaderboard helpers
+    function loadLeaderboard() {
+        try {
+            const raw = localStorage.getItem('quiz_leaderboard');
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) { return []; }
+    }
+    function saveLeaderboard(list) {
+        try { localStorage.setItem('quiz_leaderboard', JSON.stringify(list)); } catch (e) {}
+    }
+
+    // ---------- runtime state ----------
+    let quizData = makeShuffledQuiz();
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = -1;
+    let quizCompleted = false;
+
+    // DOM refs
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const optionsContainer = document.getElementById('options-container');
+    const feedbackEl = document.getElementById('feedback');
+    const progressFill = document.getElementById('progress-fill');
+    const leaderboardStart = document.getElementById('leaderboard-start');
+    const leaderboardResults = document.getElementById('leaderboard-results');
+
+    document.getElementById('total-questions').textContent = quizData.length;
+
+    // render leaderboard into a container
+    function renderLeaderboardInto(container) {
+        const data = loadLeaderboard();
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div style="color:#777;padding:10px">No entries yet</div>';
+            return;
+        }
+        // ensure sorted by score desc, recent first when tie
+        data.sort((a,b) => b.score - a.score || new Date(b.date) - new Date(a.date));
+        const html = data.map((item, idx) => {
+            return `<div class="leaderboard-item"><div>${idx+1}. ${escapeHtml(item.name)}</div><div>${item.score}/${item.total}</div></div>`;
+        }).join('');
+        container.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
+    }
+
+    // initial leaderboard render
+    renderLeaderboardInto(leaderboardStart);
+    renderLeaderboardInto(leaderboardResults);
+
+    // start quiz (shuffle each time)
+    function startQuiz() {
+        quizData = makeShuffledQuiz();
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = -1;
+        quizCompleted = false;
+        document.getElementById('total-questions').textContent = quizData.length;
+        startScreen.classList.remove('active');
+        resultsScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+        loadQuestion();
+    }
+    window.startQuiz = startQuiz;
+
+    function loadQuestion() {
+        if (currentQuestion >= quizData.length) {
+            showResults();
+            return;
+        }
+        const q = quizData[currentQuestion];
+        document.getElementById('current-question').textContent = currentQuestion + 1;
+        document.getElementById('question-text').textContent = q.question;
+        optionsContainer.innerHTML = '';
+
+        q.options.forEach((opt, idx) => {
+            const el = document.createElement('div');
+            el.className = 'option';
+            el.textContent = opt;
+            el.onclick = () => selectOption(idx);
+            optionsContainer.appendChild(el);
+        });
+
+        // progress
+        const progress = (currentQuestion / quizData.length) * 100;
+        progressFill.style.width = progress + '%';
+
+        // reset UI
+        selectedOption = -1;
+        document.getElementById('next-btn').disabled = true;
+        feedbackEl.style.display = 'none';
+        feedbackEl.className = 'note';
+    }
+
+    function selectOption(index) {
+        if (selectedOption !== -1) return;
+        selectedOption = index;
+        const options = document.querySelectorAll('.option');
+        const q = quizData[currentQuestion];
+
+        options.forEach((optEl, i) => {
+            optEl.style.pointerEvents = 'none';
+            if (i === q.correct) optEl.classList.add('correct');
+            if (i === selectedOption && i !== q.correct) optEl.classList.add('incorrect');
+        });
+
+        if (selectedOption === q.correct) {
+            score++;
+            feedbackEl.textContent = '🎉 Correct! Well done!';
+            feedbackEl.className = 'note';
+            feedbackEl.style.display = 'block';
+            feedbackEl.style.color = '#2e7d32';
+        } else {
+            feedbackEl.textContent = `❌ Incorrect. The correct answer is: ${q.options[q.correct]}`;
+            feedbackEl.className = 'note';
+            feedbackEl.style.display = 'block';
+            feedbackEl.style.color = '#c62828';
+        }
+
+        document.getElementById('next-btn').disabled = false;
+    }
+    window.selectOption = selectOption;
+
+    function nextQuestion() {
+        currentQuestion++;
+        setTimeout(() => {
             loadQuestion();
+        }, 250);
+    }
+    window.nextQuestion = nextQuestion;
+
+    function showResults() {
+        quizCompleted = true;
+        quizScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+
+        const percentage = Math.round((score / quizData.length) * 100);
+        document.getElementById('score-percentage').textContent = percentage + '%';
+        document.getElementById('correct-count').textContent = score;
+        document.getElementById('incorrect-count').textContent = quizData.length - score;
+        document.getElementById('total-count').textContent = quizData.length;
+
+        let message = '';
+        if (percentage >= 80) message = '🏆 Excellent! You\'re a quiz master!';
+        else if (percentage >= 60) message = '👏 Good job! You did well!';
+        else if (percentage >= 40) message = '👍 Not bad! Keep practicing!';
+        else message = '💪 Don\'t give up! Try again!';
+        document.getElementById('results-message').textContent = message;
+
+        // final progress to full
+        progressFill.style.width = '100%';
+    }
+    window.showResults = showResults;
+
+    function restartQuiz() {
+        // shuffle questions + options again for a fresh run
+        quizData = makeShuffledQuiz();
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = -1;
+        quizCompleted = false;
+        document.getElementById('total-questions').textContent = quizData.length;
+        resultsScreen.classList.remove('active');
+        startScreen.classList.add('active');
+        // refresh leaderboard view (in case saved)
+        renderLeaderboardInto(leaderboardStart);
+        renderLeaderboardInto(leaderboardResults);
+    }
+    window.restartQuiz = restartQuiz;
+
+    function pauseQuiz() {
+        // simple behavior: go back to start screen but keep progress intact if desired
+        quizScreen.classList.remove('active');
+        startScreen.classList.add('active');
+    }
+    window.pauseQuiz = pauseQuiz;
+
+    function saveScore() {
+        if (!quizCompleted) {
+            alert('Finish the quiz to save your score.');
+            return;
         }
+        const name = prompt('Enter your display name (optional):') || 'Anonymous';
+        const entry = { name, score, total: quizData.length, date: new Date().toISOString() };
+        try {
+            const list = loadLeaderboard();
+            list.push(entry);
+            // sort by score desc, then by newer date
+            list.sort((a,b) => b.score - a.score || new Date(b.date) - new Date(a.date));
+            const trimmed = list.slice(0, 50);
+            saveLeaderboard(trimmed);
+            renderLeaderboardInto(leaderboardStart);
+            renderLeaderboardInto(leaderboardResults);
 
-        function loadQuestion() {
-            if (currentQuestion >= quizData.length) {
-                showResults();
-                return;
-            }
-
-            const question = quizData[currentQuestion];
-            document.getElementById('current-question').textContent = currentQuestion + 1;
-            document.getElementById('question-text').textContent = question.question;
-            
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = '';
-            
-            question.options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'option';
-                optionElement.textContent = option;
-                optionElement.onclick = () => selectOption(index);
-                optionsContainer.appendChild(optionElement);
-            });
-
-            // Update progress bar
-            const progress = ((currentQuestion) / quizData.length) * 100;
-            document.getElementById('progress-fill').style.width = progress + '%';
-
-            // Reset UI
-            selectedOption = -1;
-            document.getElementById('next-btn').disabled = true;
-            document.getElementById('feedback').style.display = 'none';
-            document.getElementById('feedback').className = 'feedback';
+            // compute rank of this entry (first matching by name+date)
+            const rank = trimmed.findIndex(item => item.name === entry.name && item.date === entry.date) + 1;
+            alert('Saved to leaderboard. Your rank: #' + rank);
+        } catch (e) {
+            alert('Could not save leaderboard locally');
         }
+    }
+    window.saveScore = saveScore;
 
-        function selectOption(index) {
-            if (selectedOption !== -1) return; // Prevent multiple selections
+    // expose render to console if needed
+    window._renderLeaderboard = () => { renderLeaderboardInto(leaderboardStart); renderLeaderboardInto(leaderboardResults); };
 
-            selectedOption = index;
-            const options = document.querySelectorAll('.option');
-            const question = quizData[currentQuestion];
-            
-            // Show correct/incorrect feedback
-            options.forEach((option, i) => {
-                if (i === question.correct) {
-                    option.classList.add('correct');
-                } else if (i === selectedOption && i !== question.correct) {
-                    option.classList.add('incorrect');
-                }
-                option.style.pointerEvents = 'none';
-            });
-
-            // Update score and show feedback
-            const feedback = document.getElementById('feedback');
-            if (selectedOption === question.correct) {
-                score++;
-                feedback.textContent = '🎉 Correct! Well done!';
-                feedback.className = 'feedback correct';
-            } else {
-                feedback.textContent = `❌ Incorrect. The correct answer is: ${question.options[question.correct]}`;
-                feedback.className = 'feedback incorrect';
-            }
-            
-            feedback.style.display = 'block';
-            document.getElementById('next-btn').disabled = false;
-        }
-
-        function nextQuestion() {
-            currentQuestion++;
-            setTimeout(loadQuestion, 300); // Small delay for smooth transition
-        }
-
-        function showResults() {
-            document.getElementById('quiz-screen').classList.remove('active');
-            document.getElementById('results-screen').classList.add('active');
-            
-            const percentage = Math.round((score / quizData.length) * 100);
-            const scoreCircle = document.getElementById('score-circle');
-            
-            document.getElementById('score-percentage').textContent = percentage + '%';
-            document.getElementById('correct-count').textContent = score;
-            document.getElementById('incorrect-count').textContent = quizData.length - score;
-            document.getElementById('total-count').textContent = quizData.length;
-            
-            // Set score circle color and message based on performance
-            let message = '';
-            if (percentage >= 80) {
-                scoreCircle.className = 'score-circle excellent';
-                message = '🏆 Excellent! You\'re a quiz master!';
-            } else if (percentage >= 60) {
-                scoreCircle.className = 'score-circle good';
-                message = '👏 Good job! You did well!';
-            } else if (percentage >= 40) {
-                scoreCircle.className = 'score-circle average';
-                message = '👍 Not bad! Keep practicing!';
-            } else {
-                scoreCircle.className = 'score-circle poor';
-                message = '💪 Don\'t give up! Try again!';
-            }
-            
-            document.getElementById('results-message').textContent = message;
-        }
-
-        function restartQuiz() {
-            currentQuestion = 0;
-            score = 0;
-            selectedOption = -1;
-            document.getElementById('results-screen').classList.remove('active');
-            document.getElementById('start-screen').classList.add('active');
-        }
     </script>
 </body>
 </html>
