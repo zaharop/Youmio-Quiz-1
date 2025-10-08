@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>QuizMaster - Test Your Knowledge</title>
     <style>
-         /* === Dragon Background Styles === */
-    body, html {
+    /* Background + Dragon */
+    html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      touch-action: none;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 50% 50%, #3c6199, #1e2d4a);
     }
 
     #dragon-bg {
@@ -23,17 +23,10 @@
       width: 100%;
       height: 100%;
       z-index: 0;
-    }
-
-    svg {
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, #3c6199, #1e2d4a);
       filter: sepia(20%);
-      cursor: pointer;
     }
 
-    /* === Quiz Box === */
+    /* Quiz Box */
     .container {
       position: relative;
       z-index: 10;
@@ -43,9 +36,14 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
       width: 90%;
       max-width: 800px;
-      margin: 40px auto;
+      margin: 80px auto;
       padding: 40px;
       text-align: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
     }
 
     .btn {
@@ -67,12 +65,45 @@
   </style>
 </head>
 <body>
-38.85L-65.45 38.65Q-44.4 36.05 -17.8 19.6Q-9.9 12.8 -15.15 4.4Q-18.15 3.15 -19 0Q-18.15 -3.15 -15.15 -4.4Q-9.9 -12.8 -17.8 -19.6L-17.8 -19.55Q-44.4 -36.05 -65.45 -38.6L-67.5 -38.8Q-72.55 -39.3 -77.25 -38.95L-79.05 -38.75Q-83.7 -38.25 -87.95 -36.95L-88.95 -36.65Q-91.1 -35.55 -92.05 -34.7Q-93.05 -33.9 -92.45 -27.35M-8.6,15.6Q-17.8 23.3 -21.25 24.2Q-28.3 29.9 -39.2 33.3Q-52.45 38.85 -66.6 40.5Q-79.85 42 -92.35 36Q-93.5 35.65 -93.25 31.55L-94.05 36.1Q-96.1 46.05 -96 56.15Q-95.8 70.5 -90.8 84.1Q-86 97.3 -77.9 108.75Q-70.3 119.35 -61.1 128.6Q-65.95 123.1 -70.25 117.25Q-74.6 111.35 -78.45 105.15Q-82.1 99.3 -85 93Q-88.05 86.55 -90.05 79.7Q-92.15 72.5 -93.25 65.1Q-94.4 58.2 -94.1 51.2Q-93.75 44.35 -92.7 37.6L-89.8 38.9L-88.95 39.45Q-88.65 54.15 -87.55 59.55Q-80.65 94.5 -36.65 117.25Q-79.8 89.8 -86.3 53.1Q-87.65 46.65 -88 39.65Q-82.9 41.75 -77.45 42.75Q-75.75 50.75 -73.65 57.15Q-63.75 86.35 -17 98.3Q-24.05 95.95 -30.6 92.75L-43.65 85.9Q-49.9 82.35 -55.45 77.6Q-60.8 73 -64.8 67.15Q-68.9 61.25 -71.85 54.85Q-74.6 49.1 -76.35 42.95L-70.55 43.6L-67 43.6Q-62.95 52.1 -60.5 55.4L-56.8 60.35Q-54.55 63.35 -48.8 66.9Q-43.05 70.4 -36.5 73Q-29.85 75.65 -22.85 77.15Q-16.2 78.55 -9.45 79.15Q-2.2 79.8 5.1 79.35Q-45.9 75.55 -60.6 50.3L-64.7 43.4L-56.05 41.95Q-53.85 45.65 -50.25 50Q-32.2 72.1 21 57.85Q-34.85 68.4 -51.15 44.85L-53.7 41.2L-45.35 38.35L-42.05 40.95Q-17.75 61.45 29.75 36.85Q19.85 40.9 12.75 42.9Q5.95 44.75 -1 46Q-8.35 47.35 -16.2 46.35Q-24.05 45.3 -31.5 43.3Q-38.9 41.25 -42.55 37.05L-34.25 34.05Q-24.55 30.7 -16.75 24.5Q-12.1 20.75 -8.6 15.6" /> </g> <g id="Espina" transform="matrix(1, 0, 0, 1, 0, 0)"> <linearGradient id="LinearGradID_2" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.0229492, 0, 0, -0.0152893, 0, 0.05)" spreadMethod="pad" x1="-819.2" y1="0" x2="819.2" y2="0"> <stop offset="0" style="stop-color:#CCCCCC;stop-opacity:1" /> <stop offset="1" style="stop-color:#333333;stop-opacity:1" /> </linearGradient> <path style="fill:url(#LinearGradID_2) " d="M-18.8,0Q-17.85 -5.7 -12.3 -9.6Q-11.2 -5.35 -6.5 -8.25L-6.45 -8.2L-6.2 -8.3Q1.25 -16.25 6.65 -12.4Q0.05 -12.55 0 -5.95Q2.7 -2.4 7.75 -4.1Q18 -1.45 18.8 0L-18.8 0" /> <linearGradient id="LinearGradID_3" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.0229492, 0, 0, 0.0152893, 0, -0.05)" spreadMethod="pad" x1="-819.2" y1="0" x2="819.2" y2="0"> <stop offset="0" style="stop-color:#CCCCCC;stop-opacity:1" /> <stop offset="1" style="stop-color:#333333;stop-opacity:1" /> </linearGradient> <path style="fill:url(#LinearGradID_3) " d="M18.8,0Q18 1.45 7.75 4.1Q2.7 2.4 0 5.95Q0.05 12.55 6.65 12.4Q1.25 16.25 -6.2 8.35Q-6.35 8.25 -6.45 8.25L-6.5 8.25Q-11.2 5.35 -12.3 9.6Q-17.85 5.7 -18.8 0L18.8 0" /> </g> </defs> <g id="screen" /> </svg> <script src="dragon.js"></script> </body> </html>
+  <!-- 🐉 Dragon Background -->
+  <svg id="dragon-bg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <g id="Cabeza">
+        <path d="M-8.6,15.6Q-17.8 23.3 -21.25 24.2Q-28.3 29.9 -39.2 33.3Q-52.45 38.85 -66.6 40.5Q-79.85 42 -92.35 36Z" fill="#666"/>
+      </g>
+      <g id="Espina">
+        <path d="M-18.8,0Q-17.85 -5.7 -12.3 -9.6Q-11.2 -5.35 -6.5 -8.25Q1.25 -16.25 6.65 -12.4Q0.05 -12.55 0 -5.95Q2.7 -2.4 7.75 -4.1Q18 -1.45 18.8 0L-18.8 0" fill="#ccc"/>
+      </g>
+      <g id="Aletas">
+        <circle r="8" fill="#999"/>
+      </g>
+    </defs>
+    <g id="screen"></g>
+  </svg>
 
-    /* === Dragon Animation JS === */
+  <!-- 🧠 Quiz Box -->
+  <div class="container">
+    <h1>🧠 Youmio QuizMaster</h1>
+    <p>Score 7+ correct answers to mint your NFT!</p>
+    <button class="btn" onclick="alert('Quiz Start Logic Will Go Here')">Start Quiz</button>
+  </div>
+
+  <script>
+    "use strict";
     const screen = document.getElementById("screen");
     const xmlns = "http://www.w3.org/2000/svg";
     const xlinkns = "http://www.w3.org/1999/xlink";
+
+    let width = window.innerWidth, height = window.innerHeight;
+    const pointer = { x: width / 2, y: height / 2 };
+    let frm = Math.random();
+    let rad = 0;
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+    };
+    window.addEventListener("resize", resize);
 
     window.addEventListener("pointermove", (e) => {
       pointer.x = e.clientX;
@@ -80,9 +111,9 @@
       rad = 0;
     });
 
-    let width = window.innerWidth, height = window.innerHeight;
-    const resize = () => { width = window.innerWidth; height = window.innerHeight; };
-    window.addEventListener("resize", resize);
+    const N = 40;
+    const elems = [];
+    for (let i = 0; i < N; i++) elems[i] = { use: null, x: width / 2, y: 0 };
 
     const prepend = (use, i) => {
       const elem = document.createElementNS(xmlns, "use");
@@ -90,14 +121,6 @@
       elem.setAttributeNS(xlinkns, "xlink:href", "#" + use);
       screen.prepend(elem);
     };
-
-    const N = 40;
-    const elems = [];
-    for (let i = 0; i < N; i++) elems[i] = { use: null, x: width / 2, y: 0 };
-    const pointer = { x: width / 2, y: height / 2 };
-    const radm = Math.min(pointer.x, pointer.y) - 20;
-    let frm = Math.random();
-    let rad = 0;
 
     for (let i = 1; i < N; i++) {
       if (i === 1) prepend("Cabeza", i);
@@ -107,6 +130,7 @@
 
     const run = () => {
       requestAnimationFrame(run);
+      const radm = Math.min(pointer.x, pointer.y) - 20;
       let e = elems[0];
       const ax = (Math.cos(3 * frm) * rad * width) / height;
       const ay = (Math.sin(4 * frm) * rad * height) / width;
@@ -131,7 +155,12 @@
         pointer.y += (height / 2 - pointer.y) * 0.05;
       }
     };
+
+    run();
   </script>
+</body>
+</html>
+
 </head>
 <body>
     <div class="container">
