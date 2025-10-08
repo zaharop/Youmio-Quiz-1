@@ -9,16 +9,15 @@
 
         /* iframe containing your dragon files sits full-screen behind content */
         #dragon-frame {
-        position: fixed;
+            position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
+            border: none;
             z-index: -1;
             pointer-events: none;
-            filter: sepia(12%);
         }
 
-        /* main container stays same as your original */
         .container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -37,7 +36,6 @@
         .logo { background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; font-weight: bold; margin-bottom: 10px; }
         .subtitle { color: #666; font-size: 1.1rem; }
 
-        /* rest of your original styles (abbreviated for brevity) */
         .quiz-section { display: none; }
         .quiz-section.active { display: block; animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -66,7 +64,20 @@
         .start-screen { text-align:center; }
         .results-screen { text-align:center; }
 
-        /* responsive */
+        .leaderboard {
+            text-align: left;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        .leaderboard h4 { margin-bottom: 8px; }
+        .leaderboard-item { display:flex; justify-content:space-between; padding:6px 0; border-bottom: 1px dashed rgba(0,0,0,0.04); }
+        .leaderboard-item:last-child { border-bottom: none; }
+
         @media (max-width: 600px) {
             .container { padding: 20px; margin: 20px; }
         }
@@ -74,26 +85,27 @@
 </head>
 <body>
 
-  <!-- iframe will load your pre-existing dragon.html (which should import dragon.css and dragon.js) -->
   <iframe id="dragon-frame" src="dragon.html" title="Animated background"></iframe>
 
-  <!-- Keep your original quiz DOM unchanged (paste your full quiz HTML here) -->
   <div class="container">
       <div class="header">
           <div class="logo">🧠 QuizMaster</div>
           <div class="subtitle">Test Your Knowledge</div>
       </div>
 
-      <!-- Start Screen -->
       <div id="start-screen" class="quiz-section active start-screen">
           <h2>Welcome to QuizMaster!</h2>
           <p>Test your knowledge with our interactive quiz. You'll get immediate feedback on each question and see your final score at the end.</p>
           <div class="buttons">
-              <button class="btn" onclick="startQuiz()">Start Quiz</button>
+              <button class="btn" id="start-btn">Start Quiz</button>
+          </div>
+
+          <div class="leaderboard" id="leaderboard-start">
+            <h4>Leaderboard</h4>
+            <div id="leaderboard-list-start">No entries yet</div>
           </div>
       </div>
 
-      <!-- Quiz Screen -->
       <div id="quiz-screen" class="quiz-section">
           <div class="question-counter">
               <span id="current-question">1</span> of <span id="total-questions">10</span>
@@ -111,11 +123,10 @@
           <div class="feedback" id="feedback"></div>
 
           <div class="buttons">
-              <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>Next Question</button>
+              <button class="btn" id="next-btn" disabled>Next Question</button>
           </div>
       </div>
 
-      <!-- Results Screen -->
       <div id="results-screen" class="quiz-section results-screen">
           <h2>Quiz Complete!</h2>
           
@@ -142,226 +153,313 @@
           </div>
 
           <div class="buttons">
-              <button class="btn" onclick="restartQuiz()">Take Quiz Again</button>
+              <button class="btn" id="save-score-btn">Save Score</button>
+              <button class="btn" id="play-again-btn">Take Quiz Again</button>
+          </div>
+
+          <div class="leaderboard" id="leaderboard-results">
+            <h4>Leaderboard</h4>
+            <div id="leaderboard-list-results">No entries yet</div>
           </div>
       </div>
   </div>
 
-  <!-- Keep your original quiz JS exactly as-is below (paste your quiz script) -->
   <script>
-      // Quiz data
-      const quizData = [
-          {
-    question: "According to Youmio’s tweet, approximately how many wearable SBTs have been minted and mentioned as listed on OpenSea?",
-    options: ["~6,500", "~65,000", "~650,000", "~65"],
-    correct: 1,
-  },
-  {
-    question: "In the Youmio announcement, the project said its ecosystem will be ‘living on its own L1’ in partnership with which network?",
-    options: ["Ethereum", "Solana", "Avalanche (AVAX)", "Polygon"],
-    correct: 2,
-  },
-  {
-    question: "What does ‘L1’ most commonly refer to in blockchain terminology (as used in the Youmio announcement)?",
-    options: [
-      "A second-layer scaling solution",
-      "A Layer-1 blockchain (base/mainchain)",
-      "A token standards committee",
-      "A decentralized exchange (DEX)",
-    ],
-    correct: 1,
-  },
-  {
-    question: "What is OpenSea in the context of Youmio’s tweet about wearable SBTs?",
-    options: [
-      "A hardware wallet brand",
-      "An NFT marketplace where digital assets like wearables can be listed and viewed",
-      "A Layer-1 blockchain",
-      "A decentralized identity protocol",
-    ],
-    correct: 1,
-  },
-  {
-    question: "Youmio mentioned a ‘Mint to Chain’ style utility in their posts. Which of the following best describes ‘mint-to-chain’?",
-    options: [
-      "Sending NFTs from one chain to another automatically",
-      "Minting an asset (NFT/SBT) directly on a blockchain so the token exists on-chain immediately",
-      "A swap between tokens across DEXs",
-      "Off-chain storage of metadata only",
-    ],
-    correct: 1,
-  },
-  {
-    question: "Which Youmio milestone was explicitly mentioned in their posts as a measure of early network activity?",
-    options: [
-      "10,000 wallets created",
-      "Closed Testnet crossed 500k transactions",
-      "1 million active users",
-      "Mainnet launch on Ethereum",
-    ],
-    correct: 1,
-  },
-  {
-    question: "What kind of reward mechanic did Youmio reference as part of their L1 ecosystem (useful for community/utility)?",
-    options: [
-      "Proof-of-Work mining rewards",
-      "‘Affinity’ rewards mechanics tied to utility and 3D assets",
-      "Only simple airdrops with no utility",
-      "Yield farming for stablecoins",
-    ],
-    correct: 1,
-  },
-  {
-    question: "If a user wants to view Youmio’s wearable SBT listings as referenced in the tweet, what’s the most direct place to check?",
-    options: [
-      "A centralized exchange order book",
-      "The OpenSea marketplace listing for the project",
-      "An email newsletter archive",
-      "A private Discord DM only",
-    ],
-    correct: 1,
-  },
-  {
-    question: "Why would a project choose to run its own L1 (as Youmio announced) instead of staying entirely on another chain? (Best single answer)",
-    options: [
-      "To avoid needing any validators or nodes",
-      "To have custom consensus, lower fees, and tighter control over protocol features and economics",
-      "To become fully centralized under one company",
-      "To eliminate the need for wallets",
-    ],
-    correct: 1,
-  },
-  {
-    question: "Which claim below best matches Youmio’s public positioning from the analysed tweets?",
-    options: [
-      "Youmio is primarily a hardware wallet company.",
-      "Youmio is building an on-chain AI/3D agent ecosystem with NFTs/SBT utilities, launching L1 infrastructure (partnering with AVAX) and achieving testnet growth.",
-      "Youmio is only a social media marketing agency.",
-      "Youmio is shutting down operations.",
-    ],
-    correct: 1,
-  },
+    (function(){
+      const ORIGINAL_QUIZ = [
+        {
+          question: "According to Youmio’s tweet, approximately how many wearable SBTs have been minted and mentioned as listed on OpenSea?",
+          options: ["~6,500", "~65,000", "~650,000", "~65"],
+          correct: 1,
+        },
+        {
+          question: "In the Youmio announcement, the project said its ecosystem will be ‘living on its own L1’ in partnership with which network?",
+          options: ["Ethereum", "Solana", "Avalanche (AVAX)", "Polygon"],
+          correct: 2,
+        },
+        {
+          question: "What does ‘L1’ most commonly refer to in blockchain terminology (as used in the Youmio announcement)?",
+          options: [
+            "A second-layer scaling solution",
+            "A Layer-1 blockchain (base/mainchain)",
+            "A token standards committee",
+            "A decentralized exchange (DEX)",
+          ],
+          correct: 1,
+        },
+        {
+          question: "What is OpenSea in the context of Youmio’s tweet about wearable SBTs?",
+          options: [
+            "A hardware wallet brand",
+            "An NFT marketplace where digital assets like wearables can be listed and viewed",
+            "A Layer-1 blockchain",
+            "A decentralized identity protocol",
+          ],
+          correct: 1,
+        },
+        {
+          question: "Youmio mentioned a ‘Mint to Chain’ style utility in their posts. Which of the following best describes ‘mint-to-chain’?",
+          options: [
+            "Sending NFTs from one chain to another automatically",
+            "Minting an asset (NFT/SBT) directly on a blockchain so the token exists on-chain immediately",
+            "A swap between tokens across DEXs",
+            "Off-chain storage of metadata only",
+          ],
+          correct: 1,
+        },
+        {
+          question: "Which Youmio milestone was explicitly mentioned in their posts as a measure of early network activity?",
+          options: [
+            "10,000 wallets created",
+            "Closed Testnet crossed 500k transactions",
+            "1 million active users",
+            "Mainnet launch on Ethereum",
+          ],
+          correct: 1,
+        },
+        {
+          question: "What kind of reward mechanic did Youmio reference as part of their L1 ecosystem (useful for community/utility)?",
+          options: [
+            "Proof-of-Work mining rewards",
+            "‘Affinity’ rewards mechanics tied to utility and 3D assets",
+            "Only simple airdrops with no utility",
+            "Yield farming for stablecoins",
+          ],
+          correct: 1,
+        },
+        {
+          question: "If a user wants to view Youmio’s wearable SBT listings as referenced in the tweet, what’s the most direct place to check?",
+          options: [
+            "A centralized exchange order book",
+            "The OpenSea marketplace listing for the project",
+            "An email newsletter archive",
+            "A private Discord DM only",
+          ],
+          correct: 1,
+        },
+        {
+          question: "Why would a project choose to run its own L1 (as Youmio announced) instead of staying entirely on another chain? (Best single answer)",
+          options: [
+            "To avoid needing any validators or nodes",
+            "To have custom consensus, lower fees, and tighter control over protocol features and economics",
+            "To become fully centralized under one company",
+            "To eliminate the need for wallets",
+          ],
+          correct: 1,
+        },
+        {
+          question: "Which claim below best matches Youmio’s public positioning from the analysed tweets?",
+          options: [
+            "Youmio is primarily a hardware wallet company.",
+            "Youmio is building an on-chain AI/3D agent ecosystem with NFTs/SBT utilities, launching L1 infrastructure (partnering with AVAX) and achieving testnet growth.",
+            "Youmio is only a social media marketing agency.",
+            "Youmio is shutting down operations.",
+          ],
+          correct: 1,
+        },
       ];
 
+      function shuffleArray(arr){
+        const a = arr.slice();
+        for(let i=a.length-1;i>0;i--){
+          const j = Math.floor(Math.random()*(i+1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function deepCloneQuestions(src){
+        return src.map(q => ({ question: q.question, options: q.options.slice(), correct: q.correct }));
+      }
+
+      function shuffleQuestionsAndOptions(source){
+        // clone
+        const qcopy = deepCloneQuestions(source);
+        // shuffle options inside each question and update correct index
+        const transformed = qcopy.map(q=>{
+          const optObjs = q.options.map((o, idx)=> ({ text: o, idx }));
+          const shuffled = shuffleArray(optObjs);
+          const newCorrect = shuffled.findIndex(o=>o.idx===q.correct);
+          return { question: q.question, options: shuffled.map(x=>x.text), correct: newCorrect };
+        });
+        return shuffleArray(transformed);
+      }
+
+      // state
+      let quizData = shuffleQuestionsAndOptions(ORIGINAL_QUIZ);
       let currentQuestion = 0;
       let score = 0;
       let selectedOption = -1;
-      let quizCompleted = false;
 
-      function startQuiz() {
-          document.getElementById('start-screen').classList.remove('active');
-          document.getElementById('quiz-screen').classList.add('active');
-          document.getElementById('total-questions').textContent = quizData.length;
-          loadQuestion();
-      }
+      // DOM refs
+      const startScreen = document.getElementById('start-screen');
+      const quizScreen = document.getElementById('quiz-screen');
+      const resultsScreen = document.getElementById('results-screen');
+      const startBtn = document.getElementById('start-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const optionsContainer = document.getElementById('options-container');
+      const questionText = document.getElementById('question-text');
+      const currentQuestionEl = document.getElementById('current-question');
+      const totalQuestionsEl = document.getElementById('total-questions');
+      const progressFill = document.getElementById('progress-fill');
+      const feedbackEl = document.getElementById('feedback');
+      const scorePercentageEl = document.getElementById('score-percentage');
+      const correctCountEl = document.getElementById('correct-count');
+      const incorrectCountEl = document.getElementById('incorrect-count');
+      const totalCountEl = document.getElementById('total-count');
+      const resultsMessageEl = document.getElementById('results-message');
+      const saveScoreBtn = document.getElementById('save-score-btn');
+      const playAgainBtn = document.getElementById('play-again-btn');
+      const leaderboardStart = document.getElementById('leaderboard-list-start');
+      const leaderboardResults = document.getElementById('leaderboard-list-results');
 
-      function loadQuestion() {
-          if (currentQuestion >= quizData.length) {
-              showResults();
-              return;
+      function renderLeaderboard(targetEl){
+        try{
+          const raw = localStorage.getItem('quiz_leaderboard_v1');
+          const list = raw ? JSON.parse(raw) : [];
+          if(list.length===0){
+            targetEl.textContent = 'No entries yet';
+            return;
           }
-
-          const question = quizData[currentQuestion];
-          document.getElementById('current-question').textContent = currentQuestion + 1;
-          document.getElementById('question-text').textContent = question.question;
-          
-          const optionsContainer = document.getElementById('options-container');
-          optionsContainer.innerHTML = '';
-          
-          question.options.forEach((option, index) => {
-              const optionElement = document.createElement('div');
-              optionElement.className = 'option';
-              optionElement.textContent = option;
-              optionElement.onclick = () => selectOption(index);
-              optionsContainer.appendChild(optionElement);
+          targetEl.innerHTML = '';
+          list.slice(0,50).forEach((e, i)=>{
+            const div = document.createElement('div');
+            div.className = 'leaderboard-item';
+            div.innerHTML = `<span>${i+1}. ${escapeHtml(e.name)}</span><span>${e.score}/${e.total}</span>`;
+            targetEl.appendChild(div);
           });
-
-          // Update progress bar
-          const progress = ((currentQuestion) / quizData.length) * 100;
-          document.getElementById('progress-fill').style.width = progress + '%';
-
-          // Reset UI
-          selectedOption = -1;
-          document.getElementById('next-btn').disabled = true;
-          document.getElementById('feedback').style.display = 'none';
-          document.getElementById('feedback').className = 'feedback';
+        }catch(err){
+          targetEl.textContent = 'No entries yet';
+        }
       }
 
-      function selectOption(index) {
-          if (selectedOption !== -1) return; // Prevent multiple selections
-
-          selectedOption = index;
-          const options = document.querySelectorAll('.option');
-          const question = quizData[currentQuestion];
-          
-          // Show correct/incorrect feedback
-          options.forEach((option, i) => {
-              if (i === question.correct) {
-                  option.classList.add('correct');
-              } else if (i === selectedOption && i !== question.correct) {
-                  option.classList.add('incorrect');
-              }
-              option.style.pointerEvents = 'none';
+      function saveToLeaderboard(name, scoreVal, total){
+        try{
+          const raw = localStorage.getItem('quiz_leaderboard_v1');
+          const list = raw ? JSON.parse(raw) : [];
+          list.push({ name: name || 'Anonymous', score: scoreVal, total: total, date: new Date().toISOString() });
+          list.sort((a,b)=> {
+            if(b.score === a.score) return new Date(b.date) - new Date(a.date);
+            return b.score - a.score;
           });
-
-          // Update score and show feedback
-          const feedback = document.getElementById('feedback');
-          if (selectedOption === question.correct) {
-              score++;
-              feedback.textContent = '🎉 Correct! Well done!';
-              feedback.className = 'feedback correct';
-          } else {
-              feedback.textContent = `❌ Incorrect. The correct answer is: ${question.options[question.correct]}`;
-              feedback.className = 'feedback incorrect';
-          }
-          
-          feedback.style.display = 'block';
-          document.getElementById('next-btn').disabled = false;
+          const trimmed = list.slice(0,100);
+          localStorage.setItem('quiz_leaderboard_v1', JSON.stringify(trimmed));
+        }catch(e){}
       }
 
-      function nextQuestion() {
-          currentQuestion++;
-          setTimeout(loadQuestion, 300); // Small delay for smooth transition
+      function escapeHtml(s){
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
       }
 
-      function showResults() {
-          document.getElementById('quiz-screen').classList.remove('active');
-          document.getElementById('results-screen').classList.add('active');
-          
-          const percentage = Math.round((score / quizData.length) * 100);
-          const scoreCircle = document.getElementById('score-circle');
-          
-          document.getElementById('score-percentage').textContent = percentage + '%';
-          document.getElementById('correct-count').textContent = score;
-          document.getElementById('incorrect-count').textContent = quizData.length - score;
-          document.getElementById('total-count').textContent = quizData.length;
-          
-          // Set score circle color and message based on performance
-          let message = '';
-          if (percentage >= 80) {
-              scoreCircle.className = 'score-circle excellent';
-              message = '🏆 Excellent! You\'re a quiz master!';
-          } else if (percentage >= 60) {
-              scoreCircle.className = 'score-circle good';
-              message = '👏 Good job! You did well!';
-          } else if (percentage >= 40) {
-              scoreCircle.className = 'score-circle average';
-              message = '👍 Not bad! Keep practicing!';
-          } else {
-              scoreCircle.className = 'score-circle poor';
-              message = '💪 Don\'t give up! Try again!';
-          }
-          
-          document.getElementById('results-message').textContent = message;
+      function startQuiz(){
+        quizData = shuffleQuestionsAndOptions(ORIGINAL_QUIZ);
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = -1;
+        startScreen.classList.remove('active');
+        resultsScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+        totalQuestionsEl.textContent = quizData.length;
+        loadQuestion();
       }
 
-      function restartQuiz() {
-          currentQuestion = 0;
-          score = 0;
-          selectedOption = -1;
-          document.getElementById('results-screen').classList.remove('active');
-          document.getElementById('start-screen').classList.add('active');
+      function loadQuestion(){
+        if(currentQuestion >= quizData.length){
+          showResults();
+          return;
+        }
+        const q = quizData[currentQuestion];
+        currentQuestionEl.textContent = currentQuestion + 1;
+        questionText.textContent = q.question;
+        optionsContainer.innerHTML = '';
+        q.options.forEach((opt, idx)=>{
+          const el = document.createElement('div');
+          el.className = 'option';
+          el.textContent = opt;
+          el.onclick = ()=> selectOption(idx);
+          optionsContainer.appendChild(el);
+        });
+        const progress = ((currentQuestion) / quizData.length) * 100;
+        progressFill.style.width = progress + '%';
+        selectedOption = -1;
+        nextBtn.disabled = true;
+        feedbackEl.style.display = 'none';
+        feedbackEl.className = 'feedback';
       }
+
+      function selectOption(idx){
+        if(selectedOption !== -1) return;
+        selectedOption = idx;
+        const q = quizData[currentQuestion];
+        const optionEls = optionsContainer.querySelectorAll('.option');
+        optionEls.forEach((el, i)=>{
+          el.style.pointerEvents = 'none';
+          if(i === q.correct) el.classList.add('correct');
+          else if(i === selectedOption && i !== q.correct) el.classList.add('incorrect');
+        });
+        const feedback = feedbackEl;
+        if(selectedOption === q.correct){
+          score++;
+          feedback.textContent = '🎉 Correct! Well done!';
+          feedback.className = 'feedback correct';
+        } else {
+          feedback.textContent = `❌ Incorrect. The correct answer is: ${q.options[q.correct]}`;
+          feedback.className = 'feedback incorrect';
+        }
+        feedback.style.display = 'block';
+        nextBtn.disabled = false;
+      }
+
+      function nextQuestion(){
+        currentQuestion++;
+        setTimeout(loadQuestion, 240);
+      }
+
+      function showResults(){
+        quizScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+        const percentage = Math.round((score / quizData.length) * 100);
+        scorePercentageEl.textContent = percentage + '%';
+        correctCountEl.textContent = score;
+        incorrectCountEl.textContent = quizData.length - score;
+        totalCountEl.textContent = quizData.length;
+        let message = '';
+        if(percentage >= 80) message = '🏆 Excellent! You\'re a quiz master!';
+        else if(percentage >= 60) message = '👏 Good job! You did well!';
+        else if(percentage >= 40) message = '👍 Not bad! Keep practicing!';
+        else message = '💪 Don\'t give up! Try again!';
+        resultsMessageEl.textContent = message;
+        renderLeaderboard(leaderboardResults);
+      }
+
+      function restartQuiz(){
+        // shuffle questions & options on replay
+        quizData = shuffleQuestionsAndOptions(ORIGINAL_QUIZ);
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = -1;
+        resultsScreen.classList.remove('active');
+        startScreen.classList.add('active');
+        renderLeaderboard(leaderboardStart);
+      }
+
+      startBtn.addEventListener('click', startQuiz);
+      nextBtn.addEventListener('click', nextQuestion);
+      playAgainBtn.addEventListener('click', startQuiz);
+      saveScoreBtn.addEventListener('click', ()=>{
+        const name = window.prompt('Enter display name (optional):') || 'Anonymous';
+        saveToLeaderboard(name, score, quizData.length);
+        renderLeaderboard(leaderboardResults);
+        renderLeaderboard(leaderboardStart);
+        alert('Saved to leaderboard');
+      });
+
+      // initial leaderboard render
+      renderLeaderboard(leaderboardStart);
+
+      // expose some functions if needed for debugging
+      window.__quiz = { startQuiz, restartQuiz, getState: ()=>({ quizData, currentQuestion, score }) };
+    })();
   </script>
 </body>
 </html>
