@@ -9,13 +9,14 @@
 
         /* iframe containing your dragon files sits full-screen behind content */
         #dragon-frame {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            z-index: -1;
-            pointer-events: none; /* allow clicks through to quiz */
+         position: absolute;
+	     margin: 0;
+	     padding: 0;
+	     width: 100%;
+	     height: 100%;
+	     overflow: hidden;
+	     background: rgb(60, 97, 153);
+	    touch-action: none;
         }
 
         /* main container stays same as your original */
